@@ -86,7 +86,7 @@ namespace GtkOxyPlot.GTK
 
       tableLayout.Attach(plotView5, 4, 6, 3, 4);
 
-      double[] input = new double[] {1.5, 2.6, 3.7, 4.8, 5.9, 8.0, 20.0};
+      double[] input = new double[] { 1.5, 2.6, 3.7, 4.8, 5.9, 8.0, 20.0 };
       List<DataPoint> input2 = Enumerable.Range(1, input.Length).Zip(input, (x, y) => new DataPoint(x, y)).ToList();
       LineSeries ls = new LineSeries();
       ls.Points.AddRange(input2);
@@ -149,40 +149,75 @@ namespace GtkOxyPlot.GTK
 
       Application.Run();
     }
-    private List<PlotViewData> SimulationPlotBuilder(String title)
+    private List<PlotView> PlotViewBuilder(List<PlotData> pds)
     {
-      double[] input = new double[] {1.5, 2.6, 3.7, 4.8, 5.9, 8.0};
-      List<DataPoint> input2 = Enumerable.Range(1, input.Length).Zip(input, (x, y) => new DataPoint(x, y)).ToList();
-      LineSeries ls = new LineSeries();
-      ls.Points.AddRange(input2);
-      var plotModel6 = new PlotModel
+      List<PlotView> pvs = new List<PlotView>();
+      pds.ForEach(p =>
       {
-        Title = "doubles"
-      };
-      plotModel6.Series.Add(ls);
-      var plotView6 = new PlotView
-      {
-        Model = plotModel6
-      };
-      return null;
+        LineSeries ls = new LineSeries();
+        ls.Points.AddRange(p.getDataPoints());
+        PlotModel plotModel = new PlotModel
+        {
+          Title = p.title
+        };
+        plotModel.Series.Add(ls);
+        PlotView plotView = new PlotView
+        {
+          Model = plotModel
+        };
+        pvs.Add(plotView);
+      });
+      return pvs;
     }
-    protected internal class PlotData
+    //Simulation plot occupy: left=0; right=2;
+    //Forecast plot occupy: left=4; right=6;
+    private enum PlotType { Simulation, Forecast };
+    //Call first with Simulation plots, then Forecast, or vice versa
+    private List<PlotViewData> SimulationPlotBuilder(List<PlotData> pds, PlotType pt)
     {
-      String title;
+      List<PlotView> pvs = PlotViewBuilder(pds);
+
+      int left, right;
+      switch(pt)
+      {
+        case PlotType.Simulation: left = 0; right = 2; break;
+        case PlotType.Forecast: left = 4; right = 6; break;
+        default: left = 0; right = 0; break;
+      }
+      //TODO: throw new exception if left == right
+
+      List<PlotViewData> pvds = new List<PlotViewData>();
+      pvs.ForEach(pv =>
+      {
+        PlotViewData pvd = new PlotViewData
+        {
+          plotView = pv,
+          left = left,
+          right = right,
+          top = pvds.Count,
+          bottom = pvds.Count + 1
+        };
+      });
+
+      return pvds;
+    }
+    class PlotData
+    {
+      public String title;
       double[] rawData = new double[] { };
 
-      List<DataPoint> getDataPoints()
+      public List<DataPoint> getDataPoints()
       {
         return Enumerable.Range(0, rawData.Length).Zip(rawData, (x, y) => new DataPoint(x, y)).ToList();
       }
     }
     protected internal class PlotViewData
     {
-      PlotView plotView;
-      int left;
-      int right;
-      int top;
-      int bottom;
+      public PlotView plotView;
+      public int left;
+      public int right;
+      public int top;
+      public int bottom;
     }
   }
 }
