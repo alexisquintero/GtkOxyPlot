@@ -201,6 +201,91 @@ namespace GtkOxyPlot.GTK
 
       return pvds;
     }
+    private enum TableType { Simulation, Forecast};
+    private List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, TableType tt)
+    {
+      int left, right;
+      switch (tt)
+      {
+        case TableType.Simulation: left = 3; right = 4; break;
+        case TableType.Forecast: left = 4; right = 5; break;
+        default: left = 0; right = 0; break;
+      }
+      //TODO: throw new exception if left == right
+
+      List<TableData> tds = new List<TableData>();
+      List<Label> lbls = new List<Label>{
+        new Label("Tamaño de la muestra: "),
+        new Label("Tamaño de la población: "),
+        new Label("Desviación Media Absoluta: "),
+        new Label("Desviación Media Porcentual: "),
+        new Label("Error Porcentual Medio: "),
+        new Label("Error Cuadrático Medio: "),
+        new Label("Raíz cuadrada del error cuadrático medio: "),
+        new Label("Fecha de inicio: ")
+      };
+
+      stds.ForEach(std =>
+      {
+        List<Label> lblsValue = new List<Label>
+        {
+          new Label(std.SampleSize.ToString()),
+          new Label(std.PopulationSize.ToString()),
+          new Label(std.MeanAbsoulteDeviation.ToString()),
+          new Label(std.MeanAbsolutePercentageError.ToString()),
+          new Label(std.MeanPercentageError.ToString()),
+          new Label(std.MeanSquaredError.ToString()),
+          new Label(std.RootMeanSquareDeviation.ToString()),
+          new Label(std.StartDate.ToString())
+        };
+
+        Table table = new Table(8, 2, false);
+        uint lblsCounter = 0;
+        lbls.ForEach(l =>
+        {
+          table.Attach(l, 0, 1, lblsCounter, lblsCounter + 1);
+          lblsCounter++;
+        });
+        lblsCounter = 0;
+        lblsValue.ForEach(l =>
+        {
+          table.Attach(l, 1, 2, lblsCounter, lblsCounter + 1);
+          lblsCounter++;
+        });
+
+        TableData td = new TableData
+        {
+          table = table,
+          left = left,
+          right = right,
+          top = tds.Count,
+          bottom = tds.Count + 1
+        };
+
+        tds.Add(td);
+      });
+
+      return tds;
+    }
+    class TableData
+    {
+      public Table table;
+      public int left;
+      public int right;
+      public int top;
+      public int bottom;
+    }
+    class StatisticsTableData
+    {
+      public int SampleSize;
+      public int PopulationSize;
+      public double MeanAbsoulteDeviation;
+      public double MeanAbsolutePercentageError;
+      public double MeanPercentageError;
+      public double MeanSquaredError;
+      public double RootMeanSquareDeviation;
+      public DateTime StartDate;
+    }
     class PlotData
     {
       public String title;
