@@ -16,7 +16,7 @@ namespace GtkOxyPlot.GTK
       Application.Init();
 
       Window myWin = new Window("Plots");
-      myWin.Resize(1000, 1000);
+      myWin.Maximize();
 
       Table tableLayout = new Table(5, 6, false);
       Label lblSimulation = new Label("Simulación");
@@ -26,6 +26,7 @@ namespace GtkOxyPlot.GTK
       tableLayout.Attach(lblOptions, 2, 4, 0, 1, AttachOptions.Expand, AttachOptions.Shrink, 5, 5);
       tableLayout.Attach(lblForecast, 4, 6, 0, 1, AttachOptions.Expand, AttachOptions.Shrink, 5, 5);
 
+      //Start dummy data
       var plotModel = new PlotModel
       {
         Title = "Cos"
@@ -102,46 +103,30 @@ namespace GtkOxyPlot.GTK
 
       tableLayout.Attach(plotView6, 0, 2, 3, 4);
 
-      Table tableOptionLayout = new Table(8, 2, false);
-      Label lblSampleSize = new Label("Tamaño de la muestra: ");
-      tableOptionLayout.Attach(lblSampleSize, 0, 1, 0, 1);
-      Label lblPopulationSize = new Label("Tamaño de la población: ");
-      tableOptionLayout.Attach(lblPopulationSize, 0, 1, 1, 2);
-      Label lblError1 = new Label("Error 1: ");
-      tableOptionLayout.Attach(lblError1, 0, 1, 2, 3);
-      Label lblError2 = new Label("Error 2: ");
-      tableOptionLayout.Attach(lblError2, 0, 1, 3, 4);
-      Label lblError3 = new Label("Error 3: ");
-      tableOptionLayout.Attach(lblError3, 0, 1, 4, 5);
-      Label lblError4 = new Label("Error 4: ");
-      tableOptionLayout.Attach(lblError4, 0, 1, 5, 6);
-      Label lblError5 = new Label("Error 5: ");
-      tableOptionLayout.Attach(lblError5, 0, 1, 6, 7);
-      Label lblStartDate = new Label("Fecha inicio: ");
-      tableOptionLayout.Attach(lblStartDate, 0, 1, 7, 8);
+      StatisticsTableData std11 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
+      StatisticsTableData std12 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
+      StatisticsTableData std13 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
+      StatisticsTableData std21 = new StatisticsTableData(0,9,8,7,6,5,4,DateTime.MinValue);
+      StatisticsTableData std22 = new StatisticsTableData(0,9,8,7,6,5,4,DateTime.MinValue);
+      StatisticsTableData std23 = new StatisticsTableData(0,9,8,7,6,5,4,DateTime.MinValue);
+      List<StatisticsTableData> stdsSimulation = new List<StatisticsTableData>
+      {
+        std11,
+        std12,
+        std13
+      };
+      List<StatisticsTableData> stdsForecast = new List<StatisticsTableData>
+      {
+        std21,
+        std22,
+        std23
+      };
 
-      Label lblSampleSizeValue = new Label("0");
-      //Gtk.Widget a = new Adjustment(0, 0, 15, 1, 1, 1);
-      tableOptionLayout.Attach(lblSampleSizeValue, 1, 2, 0, 1);
-      Label lblPopulationSizeValue = new Label("Tamaño de la población: ");
-      tableOptionLayout.Attach(lblPopulationSizeValue, 1, 2, 1, 2);
-      Label lblError1Value = new Label("Error 1: ");
-      tableOptionLayout.Attach(lblError1Value, 1, 2, 2, 3);
-      Label lblError2Value = new Label("Error 2: ");
-      tableOptionLayout.Attach(lblError2Value, 1, 2, 3, 4);
-      Label lblError3Value = new Label("Error 3: ");
-      tableOptionLayout.Attach(lblError3Value, 1, 2, 4, 5);
-      Label lblError4Value = new Label("Error 4: ");
-      tableOptionLayout.Attach(lblError4Value, 1, 2, 5, 6);
-      Label lblError5Value = new Label("Error 5: ");
-      tableOptionLayout.Attach(lblError5Value, 1, 2, 6, 7);
-      Label lblStartDateValue = new Label("Fecha inicio: ");
-      tableOptionLayout.Attach(lblStartDateValue, 1, 2, 7, 8);
-
-      Table table2 = tableOptionLayout;
-
-      tableLayout.Attach(tableOptionLayout, 2, 3, 1, 2);
-      tableLayout.Attach(table2, 3, 4, 1, 2);
+      List<TableData> stbSimulation = StatisticalTableBuilder(stdsSimulation, TableType.Simulation);
+      List<TableData> stbForecast = StatisticalTableBuilder(stdsForecast, TableType.Forecast);
+      stbSimulation.ForEach(td => tableLayout.Attach(td.table, td.left, td.right, td.top, td.bottom));
+      stbForecast.ForEach(td => tableLayout.Attach(td.table, td.left, td.right, td.top, td.bottom));
+      //End dummy data
 
       myWin.Add(tableLayout);
 
@@ -155,7 +140,7 @@ namespace GtkOxyPlot.GTK
       pds.ForEach(p =>
       {
         LineSeries ls = new LineSeries();
-        ls.Points.AddRange(p.getDataPoints());
+        ls.Points.AddRange(p.GetDataPoints());
         PlotModel plotModel = new PlotModel
         {
           Title = p.title
@@ -178,7 +163,7 @@ namespace GtkOxyPlot.GTK
       List<PlotView> pvs = PlotViewBuilder(pds);
 
       int left, right;
-      switch(pt)
+      switch (pt)
       {
         case PlotType.Simulation: left = 0; right = 2; break;
         case PlotType.Forecast: left = 4; right = 6; break;
@@ -201,28 +186,28 @@ namespace GtkOxyPlot.GTK
 
       return pvds;
     }
-    private enum TableType { Simulation, Forecast};
-    private List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, TableType tt)
+    private enum TableType { Simulation, Forecast };
+    private static List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, TableType tt)
     {
-      int left, right;
+      uint left, right;
       switch (tt)
       {
-        case TableType.Simulation: left = 3; right = 4; break;
-        case TableType.Forecast: left = 4; right = 5; break;
+        case TableType.Simulation: left = 2; right = 3; break;
+        case TableType.Forecast: left = 3; right = 4; break;
         default: left = 0; right = 0; break;
       }
       //TODO: throw new exception if left == right
 
       List<TableData> tds = new List<TableData>();
-      List<Label> lbls = new List<Label>{
-        new Label("Tamaño de la muestra: "),
-        new Label("Tamaño de la población: "),
-        new Label("Desviación Media Absoluta: "),
-        new Label("Desviación Media Porcentual: "),
-        new Label("Error Porcentual Medio: "),
-        new Label("Error Cuadrático Medio: "),
-        new Label("Raíz cuadrada del error cuadrático medio: "),
-        new Label("Fecha de inicio: ")
+      List<String> lbls = new List<String>{
+        "Tamaño de la muestra: ",
+        "Tamaño de la población: ",
+        "Desviación Media Absoluta: ",
+        "Desviación Media Porcentual: ",
+        "Error Porcentual Medio: ",
+        "Error Cuadrático Medio: ",
+        "Raíz cuadrada del error cuadrático medio: ",
+        "Fecha de inicio: "
       };
 
       stds.ForEach(std =>
@@ -231,7 +216,7 @@ namespace GtkOxyPlot.GTK
         {
           new Label(std.SampleSize.ToString()),
           new Label(std.PopulationSize.ToString()),
-          new Label(std.MeanAbsoulteDeviation.ToString()),
+          new Label(std.MeanAbsoluteDeviation.ToString()),
           new Label(std.MeanAbsolutePercentageError.ToString()),
           new Label(std.MeanPercentageError.ToString()),
           new Label(std.MeanSquaredError.ToString()),
@@ -243,7 +228,7 @@ namespace GtkOxyPlot.GTK
         uint lblsCounter = 0;
         lbls.ForEach(l =>
         {
-          table.Attach(l, 0, 1, lblsCounter, lblsCounter + 1);
+          table.Attach(new Label(l), 0, 1, lblsCounter, lblsCounter + 1);
           lblsCounter++;
         });
         lblsCounter = 0;
@@ -258,8 +243,8 @@ namespace GtkOxyPlot.GTK
           table = table,
           left = left,
           right = right,
-          top = tds.Count,
-          bottom = tds.Count + 1
+          top = (uint) tds.Count + 1,
+          bottom = (uint) tds.Count + 2
         };
 
         tds.Add(td);
@@ -270,16 +255,21 @@ namespace GtkOxyPlot.GTK
     class TableData
     {
       public Table table;
-      public int left;
-      public int right;
-      public int top;
-      public int bottom;
+      public uint left;
+      public uint right;
+      public uint top;
+      public uint bottom;
     }
     class StatisticsTableData
     {
+      public StatisticsTableData(int ss, int ps, double mad, double mape, double mpe, double mse, double rmsd, DateTime sd)
+      {
+        SampleSize = ss; PopulationSize = ps; MeanAbsoluteDeviation = mad; MeanAbsolutePercentageError = mape;
+        MeanPercentageError = mpe; MeanSquaredError = mse; RootMeanSquareDeviation = rmsd; StartDate = sd;
+      }
       public int SampleSize;
       public int PopulationSize;
-      public double MeanAbsoulteDeviation;
+      public double MeanAbsoluteDeviation;
       public double MeanAbsolutePercentageError;
       public double MeanPercentageError;
       public double MeanSquaredError;
@@ -291,7 +281,7 @@ namespace GtkOxyPlot.GTK
       public String title;
       double[] rawData = new double[] { };
 
-      public List<DataPoint> getDataPoints()
+      public List<DataPoint> GetDataPoints()
       {
         return Enumerable.Range(0, rawData.Length).Zip(rawData, (x, y) => new DataPoint(x, y)).ToList();
       }

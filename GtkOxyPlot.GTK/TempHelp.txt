@@ -1,0 +1,6 @@
+﻿On graph
+    Left click: Show exact data of closest point in graph
+    Right click: move plot
+    Scroll wheel: zoom
+    Middle mouse button (hold): select area to zoom
+    Middle moust button (double click): reset graph
