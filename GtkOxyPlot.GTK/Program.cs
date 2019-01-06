@@ -16,7 +16,48 @@ namespace GtkOxyPlot.GTK
       Application.Init();
 
       Window myWin = new Window("Plots");
+      myWin.SetDefaultSize(300, 200);
       myWin.Maximize();
+      VBox box = new VBox(false, 2);
+
+      MenuBar mb = new MenuBar();
+      Menu file_menu = new Menu();
+
+      MenuItem set_default_options_item = new MenuItem("Set default options");
+      set_default_options_item.Activated += new EventHandler(delegate(object o, EventArgs args) { Application.Quit(); }); //Open new options window
+      file_menu.Append(set_default_options_item);
+
+      MenuItem refresh_item = new MenuItem("Refresh");
+      refresh_item.Activated += new EventHandler(delegate(object o, EventArgs args) { Application.Quit(); }); 
+      file_menu.Append(refresh_item);
+
+      MenuItem print_item = new MenuItem("Print");
+      print_item.Activated += new EventHandler(delegate(object o, EventArgs args) { Print.RunPageSetupDialog(myWin, null, null); });
+      file_menu.Append(print_item);
+
+      MenuItem exit_item = new MenuItem("Exit");
+      exit_item.Activated += new EventHandler(delegate(object o, EventArgs args) { Application.Quit(); });
+      file_menu.Append(exit_item);
+
+      MenuItem file_item = new MenuItem("File");
+      file_item.Submenu = file_menu;
+      mb.Append(file_item);
+
+      Menu help_menu = new Menu();
+
+      MenuItem help_window_item = new MenuItem("Help");
+      help_window_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
+      help_menu.Append(help_window_item);
+
+      MenuItem about_item = new MenuItem("About");
+      about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
+      help_menu.Append(about_item);
+
+      MenuItem help_item = new MenuItem("Help");
+      help_item.Submenu = help_menu;
+      mb.Append(help_item);
+
+      box.PackStart(mb, false, false, 0);
 
       Table tableLayout = new Table(5, 6, false);
       Label lblSimulation = new Label("Simulación");
@@ -87,17 +128,19 @@ namespace GtkOxyPlot.GTK
       stbForecast.ForEach(td => tableLayout.Attach(td.table, td.left, td.right, td.top, td.bottom));
       //End dummy data
 
-      for (int i = 1; i < stbSimulation.Count; i++)
+      int tableSize = stbSimulation.Count >= stbForecast.Count ? stbSimulation.Count : stbForecast.Count;
+      for (int i = 1; i < tableSize; i++)
       {
         tableLayout.SetRowSpacing((uint) i, 20);
       }
-      int width = 100;//Irrelevant, just need a value
+      int width = 1280;
       int length = stbSimulation.Count * 300;
       tableLayout.SetSizeRequest(width, length);
 
       ScrolledWindow sw = new ScrolledWindow();
       sw.AddWithViewport(tableLayout);
-      myWin.Add(sw);
+      box.PackStart(sw, true, true, 0);
+      myWin.Add(box);
 
       myWin.ShowAll();
 
