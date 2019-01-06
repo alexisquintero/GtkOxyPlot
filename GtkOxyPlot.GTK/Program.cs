@@ -225,16 +225,16 @@ namespace GtkOxyPlot.GTK
 
       stds.ForEach(std =>
       {
-        List<Label> lblsValue = new List<Label>
+        List<Entry> entries = new List<Entry>
         {
-          new Label(std.SampleSize.ToString()),
-          new Label(std.PopulationSize.ToString()),
-          new Label(std.MeanAbsoluteDeviation.ToString()),
-          new Label(std.MeanAbsolutePercentageError.ToString()),
-          new Label(std.MeanPercentageError.ToString()),
-          new Label(std.MeanSquaredError.ToString()),
-          new Label(std.RootMeanSquareDeviation.ToString()),
-          new Label(std.StartDate.ToString())
+          new Entry(std.SampleSize.ToString()),
+          DisableEntry(new Entry(std.PopulationSize.ToString())),
+          DisableEntry(new Entry(std.MeanAbsoluteDeviation.ToString())),
+          DisableEntry(new Entry(std.MeanAbsolutePercentageError.ToString())),
+          DisableEntry(new Entry(std.MeanPercentageError.ToString())),
+          DisableEntry(new Entry(std.MeanSquaredError.ToString())),
+          DisableEntry(new Entry(std.RootMeanSquareDeviation.ToString())),
+          DisableEntry(new Entry(std.StartDate.ToString()))
         };
 
         Table table = new Table(8, 2, false);
@@ -245,7 +245,7 @@ namespace GtkOxyPlot.GTK
           lblsCounter++;
         });
         lblsCounter = 0;
-        lblsValue.ForEach(l =>
+        entries.ForEach(l =>
         {
           table.Attach(l, 1, 2, lblsCounter, lblsCounter + 1);
           lblsCounter++;
@@ -311,6 +311,13 @@ namespace GtkOxyPlot.GTK
       public uint right;
       public uint top;
       public uint bottom;
+    }
+    private static Entry DisableEntry(Entry e)
+    {
+      e.IsEditable = false;
+      e.HasFrame = false;
+      e.CanFocus = false;
+      return e;
     }
   }
 }
