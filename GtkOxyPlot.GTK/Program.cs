@@ -24,7 +24,9 @@ namespace GtkOxyPlot.GTK
       Menu file_menu = new Menu();
 
       MenuItem set_default_options_item = new MenuItem("Set default options");
-      set_default_options_item.Activated += new EventHandler(delegate(object o, EventArgs args) { Application.Quit(); }); //Open new options window
+      Button btnSave = new Button("Guardar");
+      btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine("asdasd"); });
+      set_default_options_item.Activated += new EventHandler(delegate(object o, EventArgs args) {  defaultOptions(myWin, btnSave).ShowAll(); }); //Open new options window
       file_menu.Append(set_default_options_item);
 
       MenuItem refresh_item = new MenuItem("Refresh");
@@ -234,20 +236,21 @@ namespace GtkOxyPlot.GTK
           DisableEntry(new Entry(std.MeanPercentageError.ToString())),
           DisableEntry(new Entry(std.MeanSquaredError.ToString())),
           DisableEntry(new Entry(std.RootMeanSquareDeviation.ToString())),
-          DisableEntry(new Entry(std.StartDate.ToString()))
+          new Entry(std.StartDate.ToString())
         };
 
         Table table = new Table(8, 2, false);
         uint lblsCounter = 0;
         lbls.ForEach(l =>
         {
-          table.Attach(new Label(l), 0, 1, lblsCounter, lblsCounter + 1);
+          table.Attach(new Label(l), 0, 1, lblsCounter, lblsCounter + 1, AttachOptions.Shrink, AttachOptions.Shrink, 0, 0);
           lblsCounter++;
         });
         lblsCounter = 0;
-        entries.ForEach(l =>
+        entries.ForEach(e =>
         {
-          table.Attach(l, 1, 2, lblsCounter, lblsCounter + 1);
+          e.WidthChars = 25;
+          table.Attach(e, 1, 2, lblsCounter, lblsCounter + 1);
           lblsCounter++;
         });
 
@@ -318,6 +321,40 @@ namespace GtkOxyPlot.GTK
       e.HasFrame = false;
       e.CanFocus = false;
       return e;
+    }
+    private static Window defaultOptions(Window parent, Button btnSave)
+    {
+      Window defOptions = new Window("Default Options")
+      {
+        Modal = true,
+        TransientFor = parent
+      };
+      defOptions.SetDefaultSize(250, 80);
+
+      Table tableLayout = new Table(3, 2, false);
+      Label lblSampleSize = new Label("Tamaño de la muestra");
+      tableLayout.Attach(lblSampleSize, 0, 1, 0, 1);
+      Entry entSampleSize = new Entry();
+      tableLayout.Attach(entSampleSize, 1, 2, 0, 1);
+      Label lblStartDate = new Label("Fecha de inicio");
+      tableLayout.Attach(lblStartDate, 0, 1, 1, 2);
+      Entry entStartDate = new Entry
+      {
+        Text = "dd/mm/yyyy"
+      };
+      tableLayout.Attach(entStartDate, 1, 2, 1, 2);
+
+      btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine(entSampleSize.Text + "   " + entStartDate.Text); });
+      tableLayout.Attach(btnSave, 0, 2, 2, 3);
+
+      defOptions.Add(tableLayout);
+
+      return defOptions;
+    }
+
+    private static void BtnExit_Activated(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
     }
   }
 }
