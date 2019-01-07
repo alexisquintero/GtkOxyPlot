@@ -63,8 +63,9 @@ namespace GtkOxyPlot.GTK
 
       return pvds;
     }
-    private static List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, PlotType tt)
+    public static List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, PlotType tt)
     {
+      if (null == stds) throw new NullParameter();
       uint left, right;
       switch (tt)
       {
