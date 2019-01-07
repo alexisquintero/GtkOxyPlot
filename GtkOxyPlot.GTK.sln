@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtkOxyPlot.GTK", "GtkOxyPlot.GTK\GtkOxyPlot.GTK.csproj", "{CCCB0F85-6722-49C2-9DA3-7FC46AB49740}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GtkOxyPlot.GTK", "GtkOxyPlot.GTK\GtkOxyPlot.GTK.csproj", "{CCCB0F85-6722-49C2-9DA3-7FC46AB49740}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "GtkTest\UnitTest.csproj", "{C72374AC-EC93-435E-A30E-528D84EDBE43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{50DA7F2A-8A42-4854-B1F4-6410F27FA662}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{CCCB0F85-6722-49C2-9DA3-7FC46AB49740}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCCB0F85-6722-49C2-9DA3-7FC46AB49740}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCCB0F85-6722-49C2-9DA3-7FC46AB49740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C72374AC-EC93-435E-A30E-528D84EDBE43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C72374AC-EC93-435E-A30E-528D84EDBE43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C72374AC-EC93-435E-A30E-528D84EDBE43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C72374AC-EC93-435E-A30E-528D84EDBE43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50DA7F2A-8A42-4854-B1F4-6410F27FA662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50DA7F2A-8A42-4854-B1F4-6410F27FA662}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50DA7F2A-8A42-4854-B1F4-6410F27FA662}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50DA7F2A-8A42-4854-B1F4-6410F27FA662}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
