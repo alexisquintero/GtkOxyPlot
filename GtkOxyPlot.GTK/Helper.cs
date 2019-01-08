@@ -188,7 +188,7 @@ namespace GtkOxyPlot.GTK
       MenuItem set_default_options_item = new MenuItem("Set default options");
       Button btnSave = new Button("Guardar");
       btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine("asdasd"); });
-      set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(myWin, btnSave).ShowAll(); }); //Open new options window
+      set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(myWin, btnSave).ShowAll(); });
       file_menu.Append(set_default_options_item);
 
       MenuItem refresh_item = new MenuItem("Refresh");
@@ -216,7 +216,7 @@ namespace GtkOxyPlot.GTK
       help_menu.Append(help_window_item);
 
       MenuItem about_item = new MenuItem("About");
-      about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
+      about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowAbout(myWin); });
       help_menu.Append(about_item);
 
       MenuItem help_item = new MenuItem("Help")
@@ -315,6 +315,23 @@ namespace GtkOxyPlot.GTK
       List<TableData> stbSimulation = StatisticalTableBuilder(stdsSimulation, PlotType.Simulation);
       List<TableData> stbForecast = StatisticalTableBuilder(stdsForecast, PlotType.Forecast);
       return (pvdsSimulation, pvdsForecast, stbSimulation, stbForecast);
+    }
+    private static void ShowAbout(Window parent)
+    {
+      Window window = new Window("About")
+      {
+        Modal = true
+      };
+      window.SetDefaultSize(250, 70);
+      Table table = new Table(2, 1, true);
+      Label proyect = new Label("Proyecto: Modulo simulador de inventario");
+      Label author = new Label("Autor: Alexis Quintero");
+
+      table.Attach(proyect, 0, 1, 0, 1);
+      table.Attach(author, 0, 1, 1, 2);
+      window.Add(table);
+
+      window.ShowAll();
     }
   }
 }
