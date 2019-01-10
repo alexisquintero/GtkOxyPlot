@@ -6,12 +6,19 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Utils.Exceptions;
 
 namespace GtkOxyPlot.GTK
 {
   public class Helper
   {
+    public static List<PlotViewData> pvdsSimulation;
+    public static List<PlotViewData> pvdsForecast;
+    public static List<TableData> stbSimulation;
+    public static List<TableData> stbForecast;
+    public static List<StatisticsTableData> stdSimulation;
+    public static List<StatisticsTableData> stdForecast;
     private static List<PlotView> PlotViewBuilder(List<PlotData> pds)
     {
       List<PlotView> pvs = new List<PlotView>();
@@ -65,16 +72,17 @@ namespace GtkOxyPlot.GTK
 
       return pvds;
     }
-    public static List<TableData> StatisticalTableBuilder(List<StatisticsTableData> stds, PlotType tt)
+    public static List<TableData> StatisticalTableBuilder(PlotType tt)
     {
-      if (null == stds) throw new NullParameter();
       uint left, right;
+      List<StatisticsTableData> stds = null;
       switch (tt)
       {
-        case PlotType.Simulation: left = 2; right = 3; break;
-        case PlotType.Forecast: left = 3; right = 4; break;
+        case PlotType.Simulation: left = 2; right = 3; stds = stdSimulation; break;
+        case PlotType.Forecast: left = 3; right = 4; stds = stdForecast; break;
         default: left = 0; right = 0; break;
       }
+      if (null == stds) throw new NullParameter();
       //TODO: throw new exception if left == right
 
       List<TableData> tds = new List<TableData>();
@@ -177,7 +185,7 @@ namespace GtkOxyPlot.GTK
 
       return defOptions;
     }
-    public static Window InitWindow(List<PlotViewData> pvdsSimulation, List<PlotViewData> pvdsForecast, List<TableData> stbSimulation, List<TableData> stbForecast)
+    public static Window InitWindow()
     {
       Window myWin = new Window("Plots");
       myWin.SetDefaultSize(300, 200);
@@ -198,11 +206,11 @@ namespace GtkOxyPlot.GTK
       file_menu.Append(refresh_item);
 
       MenuItem print_item = new MenuItem("Print");
-      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowPrint(myWin, pvdsSimulation, pvdsForecast); });
+      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowPrint(myWin); });
       file_menu.Append(print_item);
 
       MenuItem exit_item = new MenuItem("Exit");
-      exit_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DeleteFiles(pvdsSimulation, pvdsForecast); Application.Quit(); });
+      exit_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DeleteFiles(); Application.Quit(); });
       file_menu.Append(exit_item);
 
       MenuItem file_item = new MenuItem("File")
@@ -260,6 +268,14 @@ namespace GtkOxyPlot.GTK
 
       return myWin;
     }
+    public static Window InitWindow(List<PlotViewData> pvdsS, List<PlotViewData> pvdsF, List<TableData> stbS, List<TableData> stbF)
+    {
+      pvdsSimulation = pvdsS;
+      pvdsForecast = pvdsF;
+      stbSimulation = stbS;
+      stbForecast = stbF;
+      return InitWindow();
+    }
     public static (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) GatherData(int ss)
     {
       //Table[{cosine},{x,0,10,0.1}] on WolframAlpha
@@ -287,8 +303,8 @@ namespace GtkOxyPlot.GTK
         new PlotData("x^2+x-5", pol)
       };
 
-      List<PlotViewData> pvdsSimulation = PlotBuilder(pdSimulation, PlotType.Simulation);
-      List<PlotViewData> pvdsForecast = PlotBuilder(pdForecast, PlotType.Forecast);
+      pvdsSimulation = PlotBuilder(pdSimulation, PlotType.Simulation);
+      pvdsForecast = PlotBuilder(pdForecast, PlotType.Forecast);
 
 
       StatisticsTableData std11 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
@@ -299,14 +315,14 @@ namespace GtkOxyPlot.GTK
       StatisticsTableData std22 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
       StatisticsTableData std23 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
       StatisticsTableData std24 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      List<StatisticsTableData> stdsSimulation = new List<StatisticsTableData>
+      stdSimulation = new List<StatisticsTableData>
       {
         std11,
         std12,
         std13,
         std14
       };
-      List<StatisticsTableData> stdsForecast = new List<StatisticsTableData>
+      stdForecast = new List<StatisticsTableData>
       {
         std21,
         std22,
@@ -314,8 +330,8 @@ namespace GtkOxyPlot.GTK
         std24
       };
 
-      List<TableData> stbSimulation = StatisticalTableBuilder(stdsSimulation, PlotType.Simulation);
-      List<TableData> stbForecast = StatisticalTableBuilder(stdsForecast, PlotType.Forecast);
+      stbSimulation = StatisticalTableBuilder(PlotType.Simulation);
+      stbForecast = StatisticalTableBuilder(PlotType.Forecast);
       return (pvdsSimulation, pvdsForecast, stbSimulation, stbForecast);
     }
     private static void ShowAbout(Window parent)
@@ -335,19 +351,19 @@ namespace GtkOxyPlot.GTK
 
       window.ShowAll();
     }
-    private static void ShowPrint(Window parent, List<PlotViewData> pvdsSimulation, List<PlotViewData> pvdsForecast)
+    private static void ShowPrint(Window parent)
     {
       HtmlToPdf Renderer = new HtmlToPdf();
       string html = "<h1>Reporte</h1>";
       string path = Directory.GetCurrentDirectory();
 
-      html += PngToPdf(pvdsSimulation, PlotType.Simulation);
-      html += PngToPdf(pvdsForecast, PlotType.Forecast);
+      html += PngToPdf(PlotType.Simulation);
+      html += PngToPdf(PlotType.Forecast);
 
       PdfDocument pdfdoc = Renderer.RenderHtmlAsPdf(html);
       pdfdoc.SaveAs("Reporte.pdf");
     }
-    private static void DeleteFiles(List<PlotViewData> pvdsSimulation, List<PlotViewData> pvdsForecast)
+    private static void DeleteFiles()
     {
       int i = 0;
       string path = Directory.GetCurrentDirectory();
@@ -373,22 +389,30 @@ namespace GtkOxyPlot.GTK
         i++;
       }
     }
-    private static string PngToPdf(List<PlotViewData> pvds, PlotType plotType)
+    private static string PngToPdf(PlotType plotType)
     {
       PngExporter pngExporter = new PngExporter { Width = 600, Height = 400, Background = OxyColors.White };
       string html = "";
       int index = 0;
       string fileName = "plot_";
+      List<(PlotViewData, StatisticsTableData)> zipList = new List<(PlotViewData, StatisticsTableData)>();
 
       switch (plotType)
       {
-        case PlotType.Simulation: fileName += "simulation_"; break;
-        case PlotType.Forecast: fileName += "forecast_"; break;
+        case PlotType.Simulation:
+          fileName += "simulation_";
+          zipList = pvdsSimulation.Zip(stdSimulation, (p, s) => (p, s)).ToList();
+          break;
+        case PlotType.Forecast: fileName += "forecast_";
+          zipList = pvdsForecast.Zip(stdForecast, (p, s) => (p, s)).ToList();
+          break;
         default: break;
       }
-     
-      foreach (PlotViewData pvd in pvds)
+
+      foreach ((PlotViewData, StatisticsTableData) z in zipList)
       {
+        PlotViewData pvd = z.Item1; StatisticsTableData std = z.Item2;
+
         Stream stream = new FileStream(fileName + index.ToString() + ".png", FileMode.Create, FileAccess.Write, FileShare.None);
         pngExporter.Export(pvd.plotView.Model, stream);
         stream.Close();
@@ -396,6 +420,17 @@ namespace GtkOxyPlot.GTK
         string imgDataURI = @"data:image/png;base64," + Convert.ToBase64String(pngBinaryData);
         html += String.Format("<img src='{0}'>", imgDataURI);
         html += "<br/>";
+
+        html += "<div>" +
+          "<span>Tamaño de la muestra: " + std.SampleSize + "</span><br>" +
+          "<span>Tamaño de la población: " + std.PopulationSize + "</span><br>" +
+          "<span>Desviación Media Absoluta: " + std.MeanAbsoluteDeviation + "</span><br>" +
+          "<span>Desviación Media Porcentual: " + std.MeanAbsolutePercentageError + "</span><br>" +
+          "<span>Error Porcentual Medio: " + std.MeanPercentageError + "</span><br>" +
+          "<span>Error Cuadrático Medio: " + std.MeanSquaredError + "</span><br>" +
+          "<span>Raíz cuadrada del error cuadrático medio: " + std.RootMeanSquareDeviation + "</span><br>" +
+          "<span>Fecha de inicio: " + std.StartDate + "</span><br>" +
+          "</div>";
         index++;
       }
       return html;
