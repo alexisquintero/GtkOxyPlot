@@ -12,7 +12,7 @@ namespace GtkOxyPlot.GTK
       Application.Init();
 
       (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) data = Helper.GatherData(1);
-      Window myWin = Helper.InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
+      Helper.InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
 
       Application.Run();
     }

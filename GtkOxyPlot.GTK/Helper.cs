@@ -20,6 +20,8 @@ namespace GtkOxyPlot.GTK
     public static List<TableData> stbForecast;
     public static List<StatisticsTableData> stdSimulation;
     public static List<StatisticsTableData> stdForecast;
+    public static Window mainWindow = null;
+    public static VBox box = null;
     private static List<PlotView> PlotViewBuilder(List<PlotData> pds)
     {
       List<PlotView> pvs = new List<PlotView>();
@@ -151,7 +153,7 @@ namespace GtkOxyPlot.GTK
       e.CanFocus = false;
       return e;
     }
-    private static Window DefaultOptions(Window parent, Button btnSave)
+    private static Window DefaultOptions(Button btnSave)
     {
       Window defOptions = new Window("Default Options")
       {
@@ -176,8 +178,8 @@ namespace GtkOxyPlot.GTK
       btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args)
       {
         Console.WriteLine(entSampleSize.Text + "   " + entStartDate.Text);
-        parent.Destroy(); Console.Write("destroy");
         (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) data = GatherData(int.Parse(entSampleSize.Text));
+        defOptions.Destroy();
         InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
       });
       tableLayout.Attach(btnSave, 0, 2, 2, 3);
@@ -186,21 +188,21 @@ namespace GtkOxyPlot.GTK
 
       return defOptions;
     }
-    public static Window InitWindow()
+    public static void InitWindow()
     {
-      Window myWin = new Window("Plots");
-      myWin.Destroyed += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
-      myWin.SetDefaultSize(300, 200);
-      myWin.Maximize();
-      VBox box = new VBox(false, 2);
+      if(null == mainWindow) mainWindow = new Window("Plots");
+      mainWindow.Destroyed += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
+      mainWindow.SetDefaultSize(300, 200);
+      mainWindow.Maximize();
+      VBox vbox = new VBox(false, 2);
 
       MenuBar mb = new MenuBar();
       Menu file_menu = new Menu();
 
       MenuItem set_default_options_item = new MenuItem("Set default options");
       Button btnSave = new Button("Guardar");
-      btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine("asdasd"); });
-      set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(myWin, btnSave).ShowAll(); });
+      //btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine("asdasd"); });
+      set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(btnSave).ShowAll(); });
       file_menu.Append(set_default_options_item);
 
       MenuItem refresh_item = new MenuItem("Refresh");
@@ -228,7 +230,7 @@ namespace GtkOxyPlot.GTK
       help_menu.Append(help_window_item);
 
       MenuItem about_item = new MenuItem("About");
-      about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowAbout(myWin); });
+      about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowAbout(); });
       help_menu.Append(about_item);
 
       MenuItem help_item = new MenuItem("Help")
@@ -237,7 +239,7 @@ namespace GtkOxyPlot.GTK
       };
       mb.Append(help_item);
 
-      box.PackStart(mb, false, false, 0);
+      vbox.PackStart(mb, false, false, 0);
 
       Table tableLayout = new Table(5, 6, false);
       Label lblSimulation = new Label("Simulación");
@@ -264,19 +266,19 @@ namespace GtkOxyPlot.GTK
 
       ScrolledWindow sw = new ScrolledWindow();
       sw.AddWithViewport(tableLayout);
-      box.PackStart(sw, true, true, 0);
-      myWin.Add(box);
-      myWin.ShowAll();
-
-      return myWin;
+      vbox.PackStart(sw, true, true, 0);
+      if (null != box) mainWindow.Remove(box);
+      box = vbox;
+      mainWindow.Add(vbox);
+      mainWindow.ShowAll();
     }
-    public static Window InitWindow(List<PlotViewData> pvdsS, List<PlotViewData> pvdsF, List<TableData> stbS, List<TableData> stbF)
+    public static void InitWindow(List<PlotViewData> pvdsS, List<PlotViewData> pvdsF, List<TableData> stbS, List<TableData> stbF)
     {
       pvdsSimulation = pvdsS;
       pvdsForecast = pvdsF;
       stbSimulation = stbS;
       stbForecast = stbF;
-      return InitWindow();
+      InitWindow();
     }
     public static (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) GatherData(int ss)
     {
@@ -313,10 +315,10 @@ namespace GtkOxyPlot.GTK
       StatisticsTableData std12 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
       StatisticsTableData std13 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
       StatisticsTableData std14 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std21 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std22 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std23 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std24 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std21 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std22 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std23 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std24 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
       stdSimulation = new List<StatisticsTableData>
       {
         std11,
@@ -336,7 +338,7 @@ namespace GtkOxyPlot.GTK
       stbForecast = StatisticalTableBuilder(PlotType.Forecast);
       return (pvdsSimulation, pvdsForecast, stbSimulation, stbForecast);
     }
-    private static void ShowAbout(Window parent)
+    private static void ShowAbout()
     {
       Window window = new Window("About")
       {
