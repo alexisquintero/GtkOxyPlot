@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Utils.Exceptions;
 
 namespace GtkOxyPlot.GTK
@@ -188,6 +189,7 @@ namespace GtkOxyPlot.GTK
     public static Window InitWindow()
     {
       Window myWin = new Window("Plots");
+      myWin.Destroyed += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
       myWin.SetDefaultSize(300, 200);
       myWin.Maximize();
       VBox box = new VBox(false, 2);
@@ -205,8 +207,8 @@ namespace GtkOxyPlot.GTK
       refresh_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
       file_menu.Append(refresh_item);
 
-      MenuItem print_item = new MenuItem("Print");
-      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowPrint(myWin); });
+      MenuItem print_item = new MenuItem("Report");
+      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowPrint(); });
       file_menu.Append(print_item);
 
       MenuItem exit_item = new MenuItem("Exit");
@@ -222,7 +224,7 @@ namespace GtkOxyPlot.GTK
       Menu help_menu = new Menu();
 
       MenuItem help_window_item = new MenuItem("Help");
-      help_window_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
+      help_window_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowHelp(); });
       help_menu.Append(help_window_item);
 
       MenuItem about_item = new MenuItem("About");
@@ -351,7 +353,7 @@ namespace GtkOxyPlot.GTK
 
       window.ShowAll();
     }
-    private static void ShowPrint(Window parent)
+    private static void ShowPrint()
     {
       HtmlToPdf Renderer = new HtmlToPdf();
       string html = "<h1>Reporte</h1>";
@@ -434,6 +436,31 @@ namespace GtkOxyPlot.GTK
         index++;
       }
       return html;
+    }
+    private static void ShowHelp()
+    {
+      Window window = new Window("Ayuda")
+      {
+        Modal = true
+      };
+      window.SetDefaultSize(800, 900);
+      string text;
+      FileStream fileStream = new FileStream(@"TempHelp.txt", FileMode.Open, FileAccess.Read);
+      using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))
+      {
+        text = streamReader.ReadToEnd();
+      };
+      TextView textView = new TextView()
+      {
+        Editable = false
+      };
+      textView.Buffer.Text = text;
+      Table table = new Table(1, 1, true);
+      ScrolledWindow sw = new ScrolledWindow();
+      table.Add(textView);
+      sw.AddWithViewport(table);
+      window.Add(sw);
+      window.ShowAll();
     }
   }
 }

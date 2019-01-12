@@ -44,4 +44,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TempHelp.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
