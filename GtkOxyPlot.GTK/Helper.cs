@@ -115,7 +115,7 @@ namespace GtkOxyPlot.GTK
           DisableEntry(new Entry(std.MeanPercentageError.ToString())),
           DisableEntry(new Entry(std.MeanSquaredError.ToString())),
           DisableEntry(new Entry(std.RootMeanSquareDeviation.ToString())),
-          new Entry(std.StartDate.ToString())
+          new Entry(std.StartDate.ToShortDateString().ToString())
         };
         Table table = new Table(8, 2, false);
         uint lblsCounter = 0;
@@ -161,6 +161,7 @@ namespace GtkOxyPlot.GTK
       };
       defOptions.SetDefaultSize(250, 80);
       btnSave.Label = "Guardar";
+      string dateDefaultValue = "dd/mm/yyyy";
 
       Table tableLayout = new Table(3, 2, false);
       Label lblSampleSize = new Label("Tamaño de la muestra");
@@ -171,17 +172,41 @@ namespace GtkOxyPlot.GTK
       tableLayout.Attach(lblStartDate, 0, 1, 1, 2);
       Entry entStartDate = new Entry
       {
-        Text = "dd/mm/yyyy"
+        Text = dateDefaultValue
       };
       tableLayout.Attach(entStartDate, 1, 2, 1, 2);
 
       btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args)
       {
-        Console.WriteLine(entSampleSize.Text + "   " + entStartDate.Text);
-        (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) data = GatherData(int.Parse(entSampleSize.Text));
-        defOptions.Destroy();
-        InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
+        int sampleSize = 0;
+        bool sampleSizeEmpty = 0 == entSampleSize.Text.ToString().Trim().Length;
+        bool sampleSizeParse = (!sampleSizeEmpty) ? int.TryParse(entSampleSize.Text, out sampleSize) : true;
+        DateTime startDate = DateTime.Today;
+        bool startDateEmpty = dateDefaultValue == entStartDate.Text.ToString();
+        bool startDateParse = (!startDateEmpty) ? DateTime.TryParse(entStartDate.Text, out startDate) : true;
+
+        string errorMessage = "";
+        errorMessage += (!sampleSizeParse) ? "Tamaño de la muestra debe ser un número entero\n" : "";
+        errorMessage += (!startDateParse) ? "Fecha de inicio debe ser de la forma " + dateDefaultValue + "\n" : "";
+
+        if(!sampleSizeParse || !startDateParse)
+        {
+          MessageDialog messageDialog = new MessageDialog(defOptions, DialogFlags.Modal, MessageType.Error, ButtonsType.Close, errorMessage);
+          messageDialog.Run();
+          messageDialog.Destroy();
+        } else
+        {
+          DefaultOptions defaultOptions = new DefaultOptions
+          {
+            sampleSize = sampleSize,
+            startDate = startDate
+          };
+          (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) data = GatherData(defaultOptions);
+          defOptions.Destroy();
+          InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
+        }
       });
+
       tableLayout.Attach(btnSave, 0, 2, 2, 3);
 
       defOptions.Add(tableLayout);
@@ -280,7 +305,7 @@ namespace GtkOxyPlot.GTK
       stbForecast = stbF;
       InitWindow();
     }
-    public static (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) GatherData(int ss)
+    public static (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) GatherData(DefaultOptions defaultOptions)
     {
       //Table[{cosine},{x,0,10,0.1}] on WolframAlpha
       double[] cos = { 1, 0.995004, 0.980067, 0.955336, 0.921061, 0.877583, 0.825336, 0.764842, 0.696707, 0.62161, 0.540302, 0.453596, 0.362358, 0.267499, 0.169967, 0.0707372, -0.0291995, -0.128844, -0.227202, -0.32329, -0.416147, -0.504846, -0.588501, -0.666276, -0.737394, -0.801144, -0.856889, -0.904072, -0.942222, -0.970958, -0.989992, -0.999135, -0.998295, -0.98748, -0.966798, -0.936457, -0.896758, -0.8481, -0.790968, -0.725932, -0.653644, -0.574824, -0.490261, -0.400799, -0.307333, -0.210796, -0.112153, -0.0123887, 0.087499, 0.186512, 0.283662, 0.377978, 0.468517, 0.554374, 0.634693, 0.70867, 0.775566, 0.834713, 0.88552, 0.927478, 0.96017, 0.983268, 0.996542, 0.999859, 0.993185, 0.976588, 0.950233, 0.914383, 0.869397, 0.815725, 0.753902, 0.684547, 0.608351, 0.526078, 0.438547, 0.346635, 0.25126, 0.153374, 0.0539554, -0.0460021, -0.1455, -0.243544, -0.339155, -0.431377, -0.519289, -0.602012, -0.67872, -0.748647, -0.811093, -0.865435, -0.91113, -0.947722, -0.974844, -0.992225, -0.999693, -0.997172, -0.984688, -0.962365, -0.930426, -0.889191, -0.839072 };
@@ -311,14 +336,14 @@ namespace GtkOxyPlot.GTK
       pvdsForecast = PlotBuilder(pdForecast, PlotType.Forecast);
 
 
-      StatisticsTableData std11 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std12 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std13 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std14 = new StatisticsTableData(ss, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std21 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std22 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std23 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std24 = new StatisticsTableData(ss, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std11 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
+      StatisticsTableData std12 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
+      StatisticsTableData std13 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
+      StatisticsTableData std14 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
+      StatisticsTableData std21 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
+      StatisticsTableData std22 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
+      StatisticsTableData std23 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
+      StatisticsTableData std24 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
       stdSimulation = new List<StatisticsTableData>
       {
         std11,

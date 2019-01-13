@@ -56,4 +56,9 @@ namespace GtkOxyPlot.GTK
     public uint top;
     public uint bottom;
   }
+  public class DefaultOptions
+  {
+    public int sampleSize = 0;
+    public DateTime startDate = DateTime.Today;
+  }
 }
