@@ -89,52 +89,32 @@ namespace GtkOxyPlot.GTK
       //TODO: throw new exception if left == right
 
       List<TableData> tds = new List<TableData>();
-      List<String> lbls = new List<String>{
-        "Tamaño de la muestra: ",
-        "Tamaño de la población: ",
-        "Desviación Media Absoluta: ",
-        "Desviación Media Porcentual: ",
-        "Error Porcentual Medio: ",
-        "Error Cuadrático Medio: ",
-        "Raíz cuadrada del error cuadrático medio: ",
-        "Fecha de inicio: "
-      };
 
       stds.ForEach(std =>
       {
-        List<Entry> entries = new List<Entry>
+        List<Label> lbls = new List<Label>
         {
-          new Entry(std.SampleSize.ToString()),
-          DisableEntry(new Entry
-          {
-            Name = "sampleSize",
-            Text = (std.PopulationSize.ToString())
-          }),
-          DisableEntry(new Entry(std.MeanAbsoluteDeviation.ToString())),
-          DisableEntry(new Entry(std.MeanAbsolutePercentageError.ToString())),
-          DisableEntry(new Entry(std.MeanPercentageError.ToString())),
-          DisableEntry(new Entry(std.MeanSquaredError.ToString())),
-          DisableEntry(new Entry(std.RootMeanSquareDeviation.ToString())),
-          new Entry(std.StartDate.ToShortDateString().ToString())
+          new Label(std.GetSampleSize()),
+          new Label(std.GetPopulationSize()),
+          new Label(std.GetMeanAbsoluteDeviation()),
+          new Label(std.GetMeanAbsolutePercentageError()),
+          new Label(std.GetMeanPercentageError()),
+          new Label(std.GetMeanSquaredError()),
+          new Label(std.GetRootMeanSquareDeviation())
         };
-        Table table = new Table(8, 2, false);
+
+        VBox vbox = new VBox(true, 0);
         uint lblsCounter = 0;
         lbls.ForEach(l =>
         {
-          table.Attach(new Label(l), 0, 1, lblsCounter, lblsCounter + 1, AttachOptions.Shrink, AttachOptions.Shrink, 0, 0);
-          lblsCounter++;
-        });
-        lblsCounter = 0;
-        entries.ForEach(e =>
-        {
-          e.WidthChars = 25;
-          table.Attach(e, 1, 2, lblsCounter, lblsCounter + 1);
+          if(PlotType.Simulation == tt) { vbox.PackStart(new Alignment(0, 0, 0, 0) { l }, true, true, 0);}
+          else { vbox.PackStart(new Alignment(1, 0, 0, 0) { l }, true, true, 0);}
           lblsCounter++;
         });
 
         TableData td = new TableData
         {
-          table = table,
+          vbox = vbox,
           left = left,
           right = right,
           top = (uint)tds.Count + 1,
@@ -145,13 +125,6 @@ namespace GtkOxyPlot.GTK
       });
 
       return tds;
-    }
-    private static Entry DisableEntry(Entry e)
-    {
-      e.IsEditable = false;
-      e.HasFrame = false;
-      e.CanFocus = false;
-      return e;
     }
     private static Window DefaultOptions(Button btnSave)
     {
@@ -226,16 +199,11 @@ namespace GtkOxyPlot.GTK
 
       MenuItem set_default_options_item = new MenuItem("Set default options");
       Button btnSave = new Button("Guardar");
-      //btnSave.Pressed += new EventHandler(delegate (object o, EventArgs args) { Console.WriteLine("asdasd"); });
       set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(btnSave).ShowAll(); });
       file_menu.Append(set_default_options_item);
 
-      MenuItem refresh_item = new MenuItem("Refresh");
-      refresh_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
-      file_menu.Append(refresh_item);
-
       MenuItem print_item = new MenuItem("Report");
-      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowPrint(); });
+      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Report(); });
       file_menu.Append(print_item);
 
       MenuItem exit_item = new MenuItem("Exit");
@@ -268,10 +236,10 @@ namespace GtkOxyPlot.GTK
 
       Table tableLayout = new Table(5, 6, false);
       Label lblSimulation = new Label("Simulación");
-      Label lblOptions = new Label("Opciones");
+      Label lblOptions = new Label("Estadisticos/Datos");
       Label lblForecast = new Label("Pronóstico");
       tableLayout.Attach(lblSimulation, 0, 2, 0, 1, AttachOptions.Expand, AttachOptions.Shrink, 5, 5);
-      tableLayout.Attach(lblOptions, 2, 4, 0, 1, AttachOptions.Expand, AttachOptions.Shrink, 5, 5);
+      tableLayout.Attach(lblOptions, 2, 4, 0, 1, AttachOptions.Shrink, AttachOptions.Shrink, 5, 5);
       tableLayout.Attach(lblForecast, 4, 6, 0, 1, AttachOptions.Expand, AttachOptions.Shrink, 5, 5);
 
       int tableSize = stbSimulation.Count >= stbForecast.Count ? stbSimulation.Count : stbForecast.Count;
@@ -286,8 +254,8 @@ namespace GtkOxyPlot.GTK
       pvdsSimulation.ForEach(pvd => tableLayout.Attach(pvd.plotView, pvd.left, pvd.right, pvd.top, pvd.bottom));
       pvdsForecast.ForEach(pvd => tableLayout.Attach(pvd.plotView, pvd.left, pvd.right, pvd.top, pvd.bottom));
 
-      stbSimulation.ForEach(td => tableLayout.Attach(td.table, td.left, td.right, td.top, td.bottom));
-      stbForecast.ForEach(td => tableLayout.Attach(td.table, td.left, td.right, td.top, td.bottom));
+      stbSimulation.ForEach(td => tableLayout.Attach(td.vbox, td.left, td.right, td.top, td.bottom, AttachOptions.Fill, AttachOptions.Shrink, 10, 0));
+      stbForecast.ForEach(td => tableLayout.Attach(td.vbox, td.left, td.right, td.top, td.bottom, AttachOptions.Fill, AttachOptions.Shrink, 10, 0));
 
       ScrolledWindow sw = new ScrolledWindow();
       sw.AddWithViewport(tableLayout);
@@ -380,7 +348,7 @@ namespace GtkOxyPlot.GTK
 
       window.ShowAll();
     }
-    private static void ShowPrint()
+    private static void Report()
     {
       HtmlToPdf Renderer = new HtmlToPdf();
       string html = "<h1>Reporte</h1>";
@@ -451,14 +419,14 @@ namespace GtkOxyPlot.GTK
         html += "<br/>";
 
         html += "<div>" +
-          "<span>Tamaño de la muestra: " + std.SampleSize + "</span><br>" +
-          "<span>Tamaño de la población: " + std.PopulationSize + "</span><br>" +
-          "<span>Desviación Media Absoluta: " + std.MeanAbsoluteDeviation + "</span><br>" +
-          "<span>Desviación Media Porcentual: " + std.MeanAbsolutePercentageError + "</span><br>" +
-          "<span>Error Porcentual Medio: " + std.MeanPercentageError + "</span><br>" +
-          "<span>Error Cuadrático Medio: " + std.MeanSquaredError + "</span><br>" +
-          "<span>Raíz cuadrada del error cuadrático medio: " + std.RootMeanSquareDeviation + "</span><br>" +
-          "<span>Fecha de inicio: " + std.StartDate + "</span><br>" +
+          std.GetSampleSize() + "</span><br>" +
+          std.GetPopulationSize() + "</span><br>" +
+          std.GetMeanAbsoluteDeviation() + "</span><br>" +
+          std.GetMeanAbsolutePercentageError() + "</span><br>" +
+          std.GetMeanPercentageError() + "</span><br>" +
+          std.GetMeanSquaredError() + "</span><br>" +
+          std.GetRootMeanSquareDeviation() + "</span><br>" +
+          std.GetStartDate() + "</span><br>" +
           "</div>";
         index++;
       }

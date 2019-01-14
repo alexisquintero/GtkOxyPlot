@@ -26,7 +26,8 @@ namespace GtkOxyPlot.GTK
   }
   public class TableData
   {
-    public Table table;
+    //public Table table;
+    public VBox vbox;
     public uint left;
     public uint right;
     public uint top;
@@ -40,13 +41,21 @@ namespace GtkOxyPlot.GTK
       MeanPercentageError = mpe; MeanSquaredError = mse; RootMeanSquareDeviation = rmsd; StartDate = sd;
     }
     public int SampleSize;
+    public string GetSampleSize() { return "Tamaño de la muestra: " + SampleSize.ToString(); }
     public int PopulationSize;
+    public string GetPopulationSize() { return "Tamaño de la población: " + PopulationSize.ToString(); }
     public double MeanAbsoluteDeviation;
+    public string GetMeanAbsoluteDeviation() { return "Desviación Media Absoluta: " + MeanAbsoluteDeviation.ToString(); }
     public double MeanAbsolutePercentageError;
+    public string GetMeanAbsolutePercentageError() { return "Desviación Media Porcentual: " + MeanAbsolutePercentageError.ToString(); }
     public double MeanPercentageError;
+    public string GetMeanPercentageError() { return "Error Porcentual Medio: " + MeanPercentageError.ToString(); }
     public double MeanSquaredError;
+    public string GetMeanSquaredError() { return "Error Cuadrático Medio: " + MeanSquaredError.ToString(); }
     public double RootMeanSquareDeviation;
+    public string GetRootMeanSquareDeviation() { return "Raíz cuadrada del error cuadrático medio: " + RootMeanSquareDeviation.ToString(); }
     public DateTime StartDate;
+    public string GetStartDate() { return "Fecha de inicio: " + StartDate.ToShortDateString().ToString(); }
   }
   public class PlotViewData
   {
