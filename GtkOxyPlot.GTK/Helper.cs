@@ -78,12 +78,13 @@ namespace GtkOxyPlot.GTK
     public static List<TableData> StatisticalTableBuilder(PlotType tt)
     {
       uint left, right;
+      float xalign;
       List<StatisticsTableData> stds = null;
       switch (tt)
       {
-        case PlotType.Simulation: left = 2; right = 3; stds = stdSimulation; break;
-        case PlotType.Forecast: left = 3; right = 4; stds = stdForecast; break;
-        default: left = 0; right = 0; break;
+        case PlotType.Simulation: left = 2; right = 3; xalign = 0; stds = stdSimulation; break;
+        case PlotType.Forecast: left = 3; right = 4; xalign = 1; stds = stdForecast; break;
+        default: left = 0; right = 0; xalign = 0; break;
       }
       if (null == stds) throw new NullParameter();
       //TODO: throw new exception if left == right
@@ -100,15 +101,15 @@ namespace GtkOxyPlot.GTK
           new Label(std.GetMeanAbsolutePercentageError()),
           new Label(std.GetMeanPercentageError()),
           new Label(std.GetMeanSquaredError()),
-          new Label(std.GetRootMeanSquareDeviation())
+          new Label(std.GetRootMeanSquareDeviation()),
+          new Label(std.GetNextPeriod())
         };
 
         VBox vbox = new VBox(true, 0);
         uint lblsCounter = 0;
         lbls.ForEach(l =>
         {
-          if(PlotType.Simulation == tt) { vbox.PackStart(new Alignment(0, 0, 0, 0) { l }, true, true, 0);}
-          else { vbox.PackStart(new Alignment(1, 0, 0, 0) { l }, true, true, 0);}
+          vbox.PackStart(new Alignment(xalign, 0, 0, 0) { l }, true, true, 0);
           lblsCounter++;
         });
 
@@ -207,7 +208,7 @@ namespace GtkOxyPlot.GTK
       file_menu.Append(print_item);
 
       MenuItem exit_item = new MenuItem("Exit");
-      exit_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DeleteFiles(); Application.Quit(); });
+      exit_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
       file_menu.Append(exit_item);
 
       MenuItem file_item = new MenuItem("File")
@@ -304,14 +305,14 @@ namespace GtkOxyPlot.GTK
       pvdsForecast = PlotBuilder(pdForecast, PlotType.Forecast);
 
 
-      StatisticsTableData std11 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
-      StatisticsTableData std12 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
-      StatisticsTableData std13 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
-      StatisticsTableData std14 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate);
-      StatisticsTableData std21 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
-      StatisticsTableData std22 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
-      StatisticsTableData std23 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
-      StatisticsTableData std24 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate);
+      StatisticsTableData std11 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate, 99);
+      StatisticsTableData std12 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate, 99);
+      StatisticsTableData std13 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate, 99);
+      StatisticsTableData std14 = new StatisticsTableData(defaultOptions.sampleSize, 2, 3, 4, 5, 6, 7, defaultOptions.startDate, 99);
+      StatisticsTableData std21 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate, 99);
+      StatisticsTableData std22 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate, 99);
+      StatisticsTableData std23 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate, 99);
+      StatisticsTableData std24 = new StatisticsTableData(defaultOptions.sampleSize, 9, 8, 7, 6, 5, 4, defaultOptions.startDate, 99);
       stdSimulation = new List<StatisticsTableData>
       {
         std11,
@@ -427,9 +428,11 @@ namespace GtkOxyPlot.GTK
           std.GetMeanSquaredError() + "</span><br>" +
           std.GetRootMeanSquareDeviation() + "</span><br>" +
           std.GetStartDate() + "</span><br>" +
+          std.GetNextPeriod() + "</span><br>" +
           "</div>";
         index++;
       }
+      DeleteFiles();
       return html;
     }
     private static void ShowHelp()
@@ -438,7 +441,7 @@ namespace GtkOxyPlot.GTK
       {
         Modal = true
       };
-      window.SetDefaultSize(800, 900);
+      window.SetDefaultSize(810, 500);
       string text;
       FileStream fileStream = new FileStream(@"TempHelp.txt", FileMode.Open, FileAccess.Read);
       using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))

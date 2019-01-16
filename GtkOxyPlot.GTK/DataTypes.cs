@@ -35,10 +35,11 @@ namespace GtkOxyPlot.GTK
   }
   public class StatisticsTableData
   {
-    public StatisticsTableData(int ss, int ps, double mad, double mape, double mpe, double mse, double rmsd, DateTime sd)
+    public StatisticsTableData(int ss, int ps, double mad, double mape, double mpe, double mse, double rmsd, DateTime sd, double np)
     {
       SampleSize = ss; PopulationSize = ps; MeanAbsoluteDeviation = mad; MeanAbsolutePercentageError = mape;
       MeanPercentageError = mpe; MeanSquaredError = mse; RootMeanSquareDeviation = rmsd; StartDate = sd;
+      NextPeriod = np;
     }
     public int SampleSize;
     public string GetSampleSize() { return "Tamaño de la muestra: " + SampleSize.ToString(); }
@@ -56,6 +57,8 @@ namespace GtkOxyPlot.GTK
     public string GetRootMeanSquareDeviation() { return "Raíz cuadrada del error cuadrático medio: " + RootMeanSquareDeviation.ToString(); }
     public DateTime StartDate;
     public string GetStartDate() { return "Fecha de inicio: " + StartDate.ToShortDateString().ToString(); }
+    public double NextPeriod;
+    public string GetNextPeriod() { return "Próximo período: " + NextPeriod.ToString(); }
   }
   public class PlotViewData
   {

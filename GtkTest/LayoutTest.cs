@@ -94,10 +94,10 @@ namespace GtkTest
     [Fact]
     public void StatisticalTableBuilder_Simulation()
     {
-      StatisticsTableData std11 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std12 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std13 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
-      StatisticsTableData std14 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue);
+      StatisticsTableData std11 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue, 99);
+      StatisticsTableData std12 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue, 99);
+      StatisticsTableData std13 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue, 99);
+      StatisticsTableData std14 = new StatisticsTableData(1, 2, 3, 4, 5, 6, 7, DateTime.MinValue, 99);
 
       Helper.stdSimulation = new List<StatisticsTableData>
       {
@@ -123,10 +123,10 @@ namespace GtkTest
     [Fact]
     public void StatisticalTableBuilder_Forecast()
     {
-      StatisticsTableData std21 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std22 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std23 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
-      StatisticsTableData std24 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue);
+      StatisticsTableData std21 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue, 99);
+      StatisticsTableData std22 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue, 99);
+      StatisticsTableData std23 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue, 99);
+      StatisticsTableData std24 = new StatisticsTableData(0, 9, 8, 7, 6, 5, 4, DateTime.MinValue, 99);
 
       Helper. stdForecast = new List<StatisticsTableData>
       {

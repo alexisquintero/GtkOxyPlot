@@ -46,7 +46,7 @@
 
   <ItemGroup>
     <None Update="TempHelp.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
