@@ -198,20 +198,24 @@ namespace GtkOxyPlot.GTK
       MenuBar mb = new MenuBar();
       Menu file_menu = new Menu();
 
-      MenuItem set_default_options_item = new MenuItem("Set default options");
+      MenuItem set_default_options_item = new MenuItem("Opciones por defecto");
       Button btnSave = new Button("Guardar");
       set_default_options_item.Activated += new EventHandler(delegate (object o, EventArgs args) { DefaultOptions(btnSave).ShowAll(); });
       file_menu.Append(set_default_options_item);
 
-      MenuItem print_item = new MenuItem("Report");
-      print_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Report(); });
-      file_menu.Append(print_item);
+      MenuItem product_item = new MenuItem("Cambio de producto");
+      product_item.Activated += new EventHandler(delegate (object o, EventArgs args) { mainWindow.HideAll(); Product.mainWindow.ShowAll(); });
+      file_menu.Append(product_item);
 
-      MenuItem exit_item = new MenuItem("Exit");
+      MenuItem report_item = new MenuItem("Reporte");
+      report_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Report(); });
+      file_menu.Append(report_item);
+
+      MenuItem exit_item = new MenuItem("Salir");
       exit_item.Activated += new EventHandler(delegate (object o, EventArgs args) { Application.Quit(); });
       file_menu.Append(exit_item);
 
-      MenuItem file_item = new MenuItem("File")
+      MenuItem file_item = new MenuItem("Archivos")
       {
         Submenu = file_menu
       };
@@ -219,15 +223,15 @@ namespace GtkOxyPlot.GTK
 
       Menu help_menu = new Menu();
 
-      MenuItem help_window_item = new MenuItem("Help");
+      MenuItem help_window_item = new MenuItem("Ayuda");
       help_window_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowHelp(); });
       help_menu.Append(help_window_item);
 
-      MenuItem about_item = new MenuItem("About");
+      MenuItem about_item = new MenuItem("Acerca");
       about_item.Activated += new EventHandler(delegate (object o, EventArgs args) { ShowAbout(); });
       help_menu.Append(about_item);
 
-      MenuItem help_item = new MenuItem("Help")
+      MenuItem help_item = new MenuItem("Ayuda")
       {
         Submenu = help_menu
       };
@@ -441,7 +445,7 @@ namespace GtkOxyPlot.GTK
       {
         Modal = true
       };
-      window.SetDefaultSize(810, 500);
+      window.SetDefaultSize(810, 550);
       string text;
       FileStream fileStream = new FileStream(@"TempHelp.txt", FileMode.Open, FileAccess.Read);
       using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))

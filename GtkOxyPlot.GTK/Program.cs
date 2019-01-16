@@ -11,9 +11,7 @@ namespace GtkOxyPlot.GTK
     {
       Application.Init();
 
-      DefaultOptions defaultOptions = new DefaultOptions();
-      (List<PlotViewData>, List<PlotViewData>, List<TableData>, List<TableData>) data = Helper.GatherData(defaultOptions);
-      Helper.InitWindow(data.Item1, data.Item2, data.Item3, data.Item4);
+      Product.Init();
 
       Application.Run();
     }
