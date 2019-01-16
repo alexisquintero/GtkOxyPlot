@@ -1,6 +1,27 @@
-﻿On graph
-    Left click: Show exact data of closest point in graph
-    Right click: move plot
-    Scroll wheel: zoom
-    Middle mouse button (hold): select area to zoom
-    Middle moust button (double click): reset graph
+Modo de uso
+
+La ventana principal está dividia en 3 columnas, la columna de la izquierda presenta las gráficas relacionadas a las simulaciones, con el nombre de cada una presente encima de cada uno. La columna del medio se subdivide en 2, mostrando los detalles específicos a cada gráfica. La columna de la derecha muestra las gráficas generadas a partir de los datos de los pronósticos.
+
+Acciones sobre las gráficas
+    Click con el botón izquierdo del mouse para obtener los datos exactos del punto más cercano a la gráfica.
+    Click y mantener apretado el botón derecho del mouse para mover la gráfica.
+    Rueda del mouse para hacer zoom.
+    Selección de área con el tercer botón del mouse (rueda) para hacer un zoom de área.
+    Doble click con el tercer botón del mouse (rueda) para resetear la gráfica.
+    
+Menú
+    Set default options: establece las opciones por defecto que se usarán para realizar las simulaciónes y los pronósticos. Vuelve a generar todas las gráficas.
+    Report: genera un reporte en formato pdf en el directorio de ejecución de la aplicación.
+    Exit: cierra la aplicación.
+    
+    Ayuda: muestra esta ventana de dialogo.
+    About: muestra información de la aplicación.
+    
+Explicaciones de los datos adicionales a la gráficas / estadísticos:
+    Tamaño de la muestra: indica la cantidad de datos que se utilizaron del total de la población.
+    Tamaño de la población: indica el cantidad total de datos disponibles para generar datos para las simulaciones y pronósticos.
+    Desviación Media Absoluta: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_media
+    Desviación Media Porcentual: la desviación media absoluta pero como porcentaje.
+    Error Porcentual Medio: https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+    Error Cuadrático Medio: https://es.wikipedia.org/wiki/Error_cuadr%C3%A1tico_medio
+    Raíz cuadrada del error cuadrático medio: https://es.wikipedia.org/wiki/Error_cuadr%C3%A1tico_medio
